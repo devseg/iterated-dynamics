@@ -184,20 +184,20 @@ int find_token_length(int mode, char const *curr, unsigned len, int *size, int *
 {
     int tok;
     int t;
-    int _size;
+    int result;
 
     tok = _find_token_length(curr, len, &t, width);
 
     if ((tok == TOK_XONLINE && mode == ONLINE) ||
             (tok == TOK_XDOC    && mode == DOC))
     {
-        _size = 0;
+        result = 0;
 
         while (true)
         {
             curr  += t;
             len   -= t;
-            _size += t;
+            result += t;
 
             tok = _find_token_length(curr, len, &t, nullptr);
 
@@ -207,13 +207,13 @@ int find_token_length(int mode, char const *curr, unsigned len, int *size, int *
                 break;
         }
 
-        _size += t;
+        result += t;
     }
     else
-        _size = t;
+        result = t;
 
     if (size != nullptr)
-        *size = _size;
+        *size = result;
 
     return (tok);
 }
