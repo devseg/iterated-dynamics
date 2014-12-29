@@ -3942,7 +3942,7 @@ void compiler::paginate_html_document()
     info.cnum = info.tnum;
     info.link_dest_warn = true;
 
-    process_document(pd_get_info, paginate_doc_output, &info);
+    process_document(pd_get_info, paginate_html_output, &info);
 
     set_hot_link_doc_page();
     set_content_doc_page();
