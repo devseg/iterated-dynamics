@@ -2393,9 +2393,9 @@ void set_topic_numbers_for_doc_contents()
 //
 void set_topic_numbers_for_links()
 {
-    LINK *l = a_link;
-    for (int lctr = 0; lctr < num_link; l++, lctr++)
+    for (int lctr = 0; lctr < num_link; lctr++)
     {
+        LINK *l = &a_link[lctr];
         switch (l->type)
         {
         case 0:      // name is the title of the topic
