@@ -67,6 +67,8 @@ std::string const DEFAULT_HTML_FNAME{"index.html"};
 char const *const TEMP_FNAME = "hc.tmp";
 char const *const SWAP_FNAME = "hcswap.tmp";
 
+char const DOUBLE_QUOTE = '"';
+
 const int MAX_ERRORS = (25);            // stop after this many errors
 const int MAX_WARNINGS = (25);          // stop after this many warnings
                                         // 0 = never stop
@@ -720,7 +722,7 @@ int find_topic_title(char const *title)
 
     ++len;
 
-    if (len > 2 && title[0] == '\"' && title[len-1] == '\"')
+    if (len > 2 && title[0] == DOUBLE_QUOTE && title[len-1] == DOUBLE_QUOTE)
     {
         ++title;
         len -= 2;
@@ -906,10 +908,10 @@ void process_contents()
 
             bool last = get_next_item();
 
-            if (cmd[0] == '\"')
+            if (cmd[0] == DOUBLE_QUOTE)
             {
                 ptr = cmd+1;
-                if (ptr[(int) strlen(ptr)-1] == '\"')
+                if (ptr[(int) strlen(ptr)-1] == DOUBLE_QUOTE)
                     ptr[(int) strlen(ptr)-1] = '\0';
                 else
                     warn(0, "Missing ending quote.");
@@ -943,10 +945,10 @@ void process_contents()
                     continue;
                 }
 
-                if (cmd[0] == '\"')
+                if (cmd[0] == DOUBLE_QUOTE)
                 {
                     ptr = cmd+1;
-                    if (ptr[(int) strlen(ptr)-1] == '\"')
+                    if (ptr[(int) strlen(ptr)-1] == DOUBLE_QUOTE)
                         ptr[(int) strlen(ptr)-1] = '\0';
                     else
                         warn(0, "Missing ending quote.");
@@ -1347,7 +1349,7 @@ bool end_of_sentence(char const *ptr)  // true if ptr is at the end of a sentenc
     if (*ptr == ')')
         --ptr;
 
-    if (*ptr == '\"')
+    if (*ptr == DOUBLE_QUOTE)
         --ptr;
 
     return (*ptr == '.' || *ptr == '?' || *ptr == '!');
