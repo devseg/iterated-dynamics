@@ -266,7 +266,6 @@ int find_line_width(int mode, char const *curr, unsigned len)
 
 bool process_document(PD_FUNC get_info, PD_FUNC output, VOIDPTR info)
 {
-    int       tok;
     int       size,
               width;
     int       col;
@@ -342,7 +341,7 @@ bool process_document(PD_FUNC get_info, PD_FUNC output, VOIDPTR info)
             {
                 while (pd.len > 0)
                 {
-                    tok = find_token_length(DOC, pd.curr, pd.len, &size, nullptr);
+                    int tok = find_token_length(DOC, pd.curr, pd.len, &size, nullptr);
                     if (tok != TOK_XDOC && tok != TOK_XONLINE &&
                             tok != TOK_NL   && tok != TOK_DONE)
                         break;
@@ -381,7 +380,7 @@ bool process_document(PD_FUNC get_info, PD_FUNC output, VOIDPTR info)
                 if (!output(PD_PERIODIC, &pd, info))
                     return false;
 
-                tok = find_token_length(DOC, pd.curr, pd.len, &size, &width);
+                int tok = find_token_length(DOC, pd.curr, pd.len, &size, &width);
 
                 switch (tok)
                 {
