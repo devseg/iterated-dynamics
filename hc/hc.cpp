@@ -2487,8 +2487,10 @@ void add_page_break(TOPIC *t, int margin, char const *text, char const *start, c
 }
 
 
-void paginate_online()    // paginate the text for on-line help
-{   // also calculates max_pages and max_links
+// paginate the text for on-line help
+// also calculates max_pages and max_links
+void paginate_online()
+{
     int       lnum;
     char     *start;
     char     *curr;
