@@ -7,3 +7,4 @@ headers/helpdefs.h
 *.tmp
 hc/fractint.doc
 .idea
+hc/*.html

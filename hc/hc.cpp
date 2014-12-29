@@ -3919,6 +3919,14 @@ void compiler::render_html()
     }
 }
 
+int num_pages = 0;
+
+bool paginate_html_output(int cmd, PD_INFO *pd, void *context)
+{
+    num_pages = std::max(num_pages, pd->pnum);
+    return paginate_doc_output(cmd, pd, context);
+}
+
 void compiler::paginate_html_document()
 {
     PAGINATE_DOC_INFO info;
@@ -3938,18 +3946,26 @@ void compiler::paginate_html_document()
     set_content_doc_page();
 }
 
+struct PRINT_HTML_INFO : public PRINT_DOC_INFO
+{
+    std::string filename;
+    bool first_page;
+};
+
 class html_processor
 {
 public:
     html_processor(std::string const &fname)
         : fname_(fname)
     {
+        info.file = nullptr;
         info.tnum = -1;
         info.cnum = -1;
         info.link_dest_warn = false;
         info.margin = PAGE_INDENT;
         info.start_of_line = true;
         info.spaces = 0;
+        info.first_page = true;
     }
 
     void process();
@@ -3969,7 +3985,7 @@ private:
     void print_string(char const *s, int n);
 
     std::string const &fname_;
-    PRINT_DOC_INFO info;
+    PRINT_HTML_INFO info;
 };
 
 void compiler::print_html_document(std::string const &fname)
@@ -4029,25 +4045,91 @@ bool html_processor::get_info(int cmd, PD_INFO *pd)
     }
 }
 
+std::string preamble(PD_INFO const *pd)
+{
+    std::ostringstream buff;
+    buff << "<html>\n"
+        "<head>\n"
+        "<title>Iterated Dynamics";
+    if (pd->pnum != 1)
+    {
+        buff << ": Page " << pd->pnum;
+    }
+    buff << "</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "<div>\n"
+        "<pre>\n";
+    if (pd->pnum == 1)
+    {
+        buff << "&lt; Prev";
+    }
+    else
+    {
+        if (pd->pnum == 2)
+        {
+            buff << R"(<a href="index.html">&lt; Prev</a>)";
+        }
+        else
+        {
+            // cppcheck-suppress syntaxError
+            buff << R"(<a href="page)" << (pd->pnum - 1) << R"(.html">&lt; Prev</a>)";
+        }
+    }
+    buff << "           Iterated Dynamics Version 1.0          Page " << pd->pnum;
+    if (pd->pnum == num_pages)
+    {
+        buff << " Next &gt;";
+    }
+    else
+    {
+        buff << R"( <a href="page)" << (pd->pnum + 1) << R"(.html">Next &gt;</a>)";
+    }
+    buff << "</pre>\n"
+        "</div>\n"
+        "<pre>\n";
+    return buff.str();
+}
+
+std::string postamble()
+{
+    return "</pre>\n"
+    "</body>\n"
+    "</html>\n"; 
+}
+
 bool html_processor::print_html(int cmd, PD_INFO *pd)
 {
     switch (cmd)
     {
     case PD_HEADING:
     {
-        std::ostringstream buff;
+        if (pd->pnum == 1)
+        {
+            info.filename = "index.html";
+        }
+        else
+        {
+            std::ostringstream filename;
+            filename << "page" << pd->pnum << ".html";
+            info.filename = filename.str();
+        }
+        assert(info.file == nullptr);
+        info.file = fopen(info.filename.c_str(), "wt");
+        if (info.file == nullptr)
+            fatal(0, "Couldn't create \"%s\"", info.filename.c_str());
         info.margin = 0;
-        buff << "\n"
-            "                  Iterated Dynamics Version 1.0                 Page "
-            << pd->pnum << "\n\n";
-        print_string(buff.str().c_str(), 0);
+        fputs(preamble(pd).c_str(), info.file);
         info.margin = PAGE_INDENT;
+        info.first_page = false;
         return true;
     }
 
     case PD_FOOTING:
         info.margin = 0;
-        print_char('\f', 1);
+        fputs(postamble().c_str(), info.file);
+        fclose(info.file);
+        info.file = nullptr;
         info.margin = PAGE_INDENT;
         return true;
 
@@ -4085,6 +4167,7 @@ bool html_processor::print_html(int cmd, PD_INFO *pd)
 
 void html_processor::print_char(int c, int n)
 {
+    assert(info.file != nullptr);
     while (n-- > 0)
     {
         if (c == ' ')
@@ -4132,6 +4215,7 @@ void html_processor::print_char(int c, int n)
 
 void html_processor::print_string(char const *s, int n)
 {
+    assert(info.file != nullptr);
     if (n > 0)
     {
         while (n-- > 0)
@@ -4151,25 +4235,8 @@ void html_processor::process()
 
     msg("Printing to: %s", fname_.c_str());
 
-    info.file = fopen(fname_.c_str(), "wt");
-    if (info.file == nullptr)
-        fatal(0, "Couldn't create \"%s\"", fname_.c_str());
-    fputs("<html>\n"
-        "<head>\n"
-        "<title>Iterated Dynamics</title>\n"
-        "</head>\n"
-        "<body>\n"
-        "<pre>\n",
-        info.file);
-
     process_document(get_info_, print_html_, this);
-
-    fputs("</pre>\n"
-        "</body>\n"
-        "</html>\n",
-        info.file);
-
-    fclose(info.file);
+    assert(info.file == nullptr);
 }
 
 #if defined(_WIN32)
