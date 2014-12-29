@@ -1162,15 +1162,15 @@ int create_table()
 
         case '~':
         {
-            bool imbedded;
+            bool embedded;
 
             ch = read_char();
 
             if (ch == '(')
-                imbedded = true;
+                embedded = true;
             else
             {
-                imbedded = false;
+                embedded = false;
                 unread_char(ch);
             }
 
@@ -1189,7 +1189,7 @@ int create_table()
 
             if (ch == ',')
             {
-                if (imbedded)
+                if (embedded)
                     unread_char('(');
                 unread_char('~');
             }
@@ -1245,16 +1245,16 @@ void process_comment()
 
         if (ch == '~')
         {
-            bool imbedded;
+            bool embedded;
             char *ptr;
 
             ch = read_char();
 
             if (ch == '(')
-                imbedded = true;
+                embedded = true;
             else
             {
-                imbedded = false;
+                embedded = false;
                 unread_char(ch);
             }
 
@@ -1267,7 +1267,7 @@ void process_comment()
             {
                 if (ch == ',')
                 {
-                    if (imbedded)
+                    if (embedded)
                         unread_char('(');
                     unread_char('~');
                 }
@@ -1461,18 +1461,18 @@ void read_src(char const *fname)
 
         if (ch == '~')   // is is a command?
         {
-            bool imbedded;
+            bool embedded;
             int eoff;
 
             ch = read_char();
             if (ch == '(')
             {
-                imbedded = true;
+                embedded = true;
                 eoff = 0;
             }
             else
             {
-                imbedded = false;
+                embedded = false;
                 eoff = 0;
                 unread_char(ch);
             }
@@ -1486,7 +1486,7 @@ void read_src(char const *fname)
                 while (ch == ' ');
                 unread_char(ch);
 
-                if (imbedded)
+                if (embedded)
                     ptr = read_until(cmd, 128, ")\n,");
                 else
                     ptr = read_until(cmd, 128, "\n,");
@@ -1500,7 +1500,7 @@ void read_src(char const *fname)
                 if (*ptr == '\n')
                     ++eoff;
 
-                if (imbedded && *ptr == '\n')
+                if (embedded && *ptr == '\n')
                     error(eoff, "Embedded command has no closing paren (\')\')");
 
                 done = (*ptr != ',');   // we done if it's not a comma
@@ -1604,7 +1604,7 @@ void read_src(char const *fname)
                         end_topic(&t);
                     if (!done)
                     {
-                        if (imbedded)
+                        if (embedded)
                             unread_char('(');
                         unread_char('~');
                         done = true;
@@ -1837,7 +1837,7 @@ void read_src(char const *fname)
 
                         if (!done)
                         {
-                            if (imbedded)
+                            if (embedded)
                                 unread_char('(');
                             unread_char('~');
                             done = true;
