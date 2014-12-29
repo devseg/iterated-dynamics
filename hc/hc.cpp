@@ -3658,7 +3658,6 @@ private:
     void print();
     void render_html();
     void paginate_html_document();
-    void print_html_document(std::string const &output_filename);
 
     int argc;
     char **argv;
@@ -3900,27 +3899,6 @@ void compiler::print()
         report_errors();
 }
 
-void compiler::render_html()
-{
-    read_source_file();
-    make_hot_links();
-
-    if (errors == 0)
-    {
-        paginate_html_document();
-    }
-
-    if (errors == 0)
-    {
-        print_html_document(fname2.empty() ? DEFAULT_HTML_FNAME : fname2);
-    }
-
-    if (errors > 0 || warnings > 0)
-    {
-        report_errors();
-    }
-}
-
 int num_pages = 0;
 
 bool paginate_html_output(int cmd, PD_INFO *pd, void *context)
@@ -3989,11 +3967,6 @@ private:
     std::string const &fname_;
     PRINT_HTML_INFO info;
 };
-
-void compiler::print_html_document(std::string const &fname)
-{
-    html_processor(fname).process();
-}
 
 bool html_processor::get_info(int cmd, PD_INFO *pd)
 {
@@ -4239,6 +4212,27 @@ void html_processor::process()
 
     process_document(get_info_, print_html_, this);
     assert(info.file == nullptr);
+}
+
+void compiler::render_html()
+{
+    read_source_file();
+    make_hot_links();
+
+    if (errors == 0)
+    {
+        paginate_html_document();
+    }
+
+    if (errors == 0)
+    {
+        html_processor(fname2.empty() ? DEFAULT_HTML_FNAME : fname2).process();
+    }
+
+    if (errors > 0 || warnings > 0)
+    {
+        report_errors();
+    }
 }
 
 #if defined(_WIN32)
