@@ -2717,17 +2717,14 @@ LABEL *find_next_label_by_topic(int t)
  */
 void set_hot_link_doc_page()
 {
-    LINK  *l;
-    LABEL *lbl;
-    int    t;
-
-    l = a_link;
+    LINK  *l = a_link;
     for (int lctr = 0; lctr < num_link; l++, lctr++)
     {
         switch (l->type)
         {
         case 0:      // name is the title of the topic
-            t = find_topic_title(l->name);
+        {
+            int t = find_topic_title(l->name);
             if (t == -1)
             {
                 src_cfname = l->srcfile;
@@ -2738,9 +2735,11 @@ void set_hot_link_doc_page()
             else
                 l->doc_page = topic[t].doc_page;
             break;
+        }
 
         case 1:  // name is the name of a label
-            lbl = find_label(l->name);
+        {
+            LABEL *lbl = find_label(l->name);
             if (lbl == nullptr)
             {
                 src_cfname = l->srcfile;
@@ -2751,6 +2750,7 @@ void set_hot_link_doc_page()
             else
                 l->doc_page = lbl->doc_page;
             break;
+        }
 
         case 2:   // special topics don't appear in the document
             break;
