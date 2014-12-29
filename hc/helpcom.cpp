@@ -266,14 +266,11 @@ int find_line_width(int mode, char const *curr, unsigned len)
 
 bool process_document(PD_FUNC get_info, PD_FUNC output, VOIDPTR info)
 {
-    int       size,
-              width;
-    int       col;
     char      page_text[10];
-    PD_INFO   pd;
-    char      nl = '\n',
-              sp = ' ';
+    char nl = '\n';
+    char sp = ' ';
 
+    PD_INFO   pd;
     pd.pnum = 1;
     pd.lnum = 0;
 
@@ -327,19 +324,19 @@ bool process_document(PD_FUNC get_info, PD_FUNC output, VOIDPTR info)
 
         bool first_topic = true;
 
-        bool skip_blanks;
         while (get_info(PD_GET_TOPIC, &pd, info))
         {
             if (!output(PD_START_TOPIC, &pd, info))
                 return false;
 
-            skip_blanks = false;
-            col = 0;
+            bool skip_blanks = false;
+            int col = 0;
 
             if (!first_section)     /* do not skip blanks for DocContents */
             {
                 while (pd.len > 0)
                 {
+                    int size;
                     int tok = find_token_length(DOC, pd.curr, pd.len, &size, nullptr);
                     if (tok != TOK_XDOC && tok != TOK_XONLINE &&
                             tok != TOK_NL   && tok != TOK_DONE)
@@ -379,6 +376,8 @@ bool process_document(PD_FUNC get_info, PD_FUNC output, VOIDPTR info)
                 if (!output(PD_PERIODIC, &pd, info))
                     return false;
 
+                int size;
+                int width;
                 switch (find_token_length(DOC, pd.curr, pd.len, &size, &width))
                 {
                 case TOK_PARA:
