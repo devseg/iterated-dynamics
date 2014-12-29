@@ -2326,9 +2326,9 @@ void read_src(char const *fname)
 //
 void set_topic_numbers_for_doc_contents()
 {
-    CONTENT *c = contents;
-    for (int lctr = 0; lctr < num_contents; lctr++, c++)
+    for (int lctr = 0; lctr < num_contents; lctr++)
     {
+        CONTENT *c = &contents[lctr];
         for (int ctr = 0; ctr < c->num_topic; ctr++)
         {
             if (c->is_label[ctr])
