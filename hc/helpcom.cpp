@@ -45,7 +45,7 @@ bool is_hyphen(char const *ptr)   /* true if ptr points to a real hyphen */
 }
 
 
-int _find_token_length(char const *curr, unsigned len, int *size, int *width)
+int find_token_length(char const *curr, unsigned len, int *size, int *width)
 {
     int _size  = 0;
     int _width = 0;
@@ -186,7 +186,7 @@ int find_token_length(int mode, char const *curr, unsigned len, int *size, int *
     int t;
     int result;
 
-    tok = _find_token_length(curr, len, &t, width);
+    tok = find_token_length(curr, len, &t, width);
 
     if ((tok == TOK_XONLINE && mode == ONLINE) ||
             (tok == TOK_XDOC    && mode == DOC))
@@ -199,7 +199,7 @@ int find_token_length(int mode, char const *curr, unsigned len, int *size, int *
             len   -= t;
             result += t;
 
-            tok = _find_token_length(curr, len, &t, nullptr);
+            tok = find_token_length(curr, len, &t, nullptr);
 
             if ((tok == TOK_XONLINE && mode == ONLINE) ||
                     (tok == TOK_XDOC    && mode == DOC)    ||
