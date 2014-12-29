@@ -855,11 +855,11 @@ bool get_next_item()
 
 void process_contents()
 {
-    CONTENT c;
+    CONTENT c = { 0 };
     char   *ptr;
     int     indent;
     int     ch;
-    TOPIC   t;
+    TOPIC   t = { 0 };
 
     t.flags     = 0;
     t.title_len = (unsigned) strlen(DOCCONTENTS_TITLE)+1;
@@ -2321,26 +2321,11 @@ void read_src(char const *fname)
 }
 
 
-/*
- * stuff to resolve hot-link references.
- */
-
-
-/*
- * calculate topic_num/topic_off for each link.
- */
-void make_hot_links()
+// Calculate topic_num for all entries in DocContents.  Also set
+// "TF_IN_DOC" flag for all topics included in the document.
+//
+void set_topic_numbers_for_doc_contents()
 {
-    LINK    *l;
-    LABEL   *lbl;
-    int      t;
-
-    msg("Making hot-links.");
-
-    /*
-     * Calculate topic_num for all entries in DocContents.  Also set
-     * "TF_IN_DOC" flag for all topics included in the document.
-     */
     CONTENT *c = contents;
     for (int lctr = 0; lctr < num_contents; lctr++, c++)
     {
@@ -2348,7 +2333,7 @@ void make_hot_links()
         {
             if (c->is_label[ctr])
             {
-                lbl = find_label(c->topic_name[ctr]);
+                LABEL *lbl = find_label(c->topic_name[ctr]);
                 if (lbl == nullptr)
                 {
                     src_cfname = c->srcfile;
@@ -2370,7 +2355,7 @@ void make_hot_links()
                         c->topic_num[ctr] = lbl->topic_num;
                         if (topic[lbl->topic_num].flags & TF_IN_DOC)
                             warn(0, "Topic \"%s\" appears in document more than once.",
-                                 topic[lbl->topic_num].title);
+                            topic[lbl->topic_num].title);
                         else
                             topic[lbl->topic_num].flags |= TF_IN_DOC;
                     }
@@ -2379,7 +2364,7 @@ void make_hot_links()
             }
             else
             {
-                t = find_topic_title(c->topic_name[ctr]);
+                int t = find_topic_title(c->topic_name[ctr]);
 
                 if (t == -1)
                 {
@@ -2393,25 +2378,29 @@ void make_hot_links()
                     c->topic_num[ctr] = t;
                     if (topic[t].flags & TF_IN_DOC)
                         warn(0, "Topic \"%s\" appears in document more than once.",
-                             topic[t].title);
+                        topic[t].title);
                     else
                         topic[t].flags |= TF_IN_DOC;
                 }
             }
         }
     }
+}
 
-    /*
-     * Find topic_num and topic_off for all hot-links.  Also flag all hot-
-     * links which will (probably) appear in the document.
-     */
-    l = a_link;
+
+// Find topic_num and topic_off for all hot-links.  Also flag all hot-
+// links which will (probably) appear in the document.
+//
+void set_topic_numbers_for_links()
+{
+    LINK *l = a_link;
     for (int lctr = 0; lctr < num_link; l++, lctr++)
     {
         switch (l->type)
         {
         case 0:      // name is the title of the topic
-            t = find_topic_title(l->name);
+        {
+            int t = find_topic_title(l->name);
             if (t == -1)
             {
                 src_cfname = l->srcfile;
@@ -2426,9 +2415,11 @@ void make_hot_links()
                 l->doc_page = (topic[t].flags & TF_IN_DOC) ? 0 : -1;
             }
             break;
+        }
 
         case 1:  // name is the name of a label
-            lbl = find_label(l->name);
+        {
+            LABEL *lbl = find_label(l->name);
             if (lbl == nullptr)
             {
                 src_cfname = l->srcfile;
@@ -2449,16 +2440,31 @@ void make_hot_links()
                 {
                     l->topic_num = lbl->topic_num;
                     l->topic_off = lbl->topic_off;
-                    l->doc_page  = (topic[lbl->topic_num].flags & TF_IN_DOC) ? 0 : -1;
+                    l->doc_page = (topic[lbl->topic_num].flags & TF_IN_DOC) ? 0 : -1;
                 }
             }
             break;
+        }
 
         case 2:   // it's a "special" link; topic_off already has the value
             break;
         }
     }
+}
 
+/*
+ * stuff to resolve hot-link references.
+ */
+
+
+/*
+ * calculate topic_num/topic_off for each link.
+ */
+void make_hot_links()
+{
+    msg("Making hot-links.");
+    set_topic_numbers_for_doc_contents();
+    set_topic_numbers_for_links();
 }
 
 
@@ -4177,6 +4183,7 @@ void check_buffer(char const *curr, unsigned off, char const *buffer)
         fatal(0, "Buffer overflowerd -- Help topic too large.");
     }
 }
+
 #if defined(_WIN32)
 #pragma warning(pop)
 #endif
