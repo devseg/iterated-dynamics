@@ -2717,9 +2717,9 @@ LABEL *find_next_label_by_topic(int t)
  */
 void set_hot_link_doc_page()
 {
-    LINK  *l = a_link;
-    for (int lctr = 0; lctr < num_link; l++, lctr++)
+    for (int lctr = 0; lctr < num_link; lctr++)
     {
+        LINK *l = &a_link[lctr];
         switch (l->type)
         {
         case 0:      // name is the title of the topic
