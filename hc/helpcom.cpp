@@ -380,9 +380,7 @@ bool process_document(PD_FUNC get_info, PD_FUNC output, VOIDPTR info)
                 if (!output(PD_PERIODIC, &pd, info))
                     return false;
 
-                int tok = find_token_length(DOC, pd.curr, pd.len, &size, &width);
-
-                switch (tok)
+                switch (find_token_length(DOC, pd.curr, pd.len, &size, &width))
                 {
                 case TOK_PARA:
                 {
@@ -409,7 +407,7 @@ bool process_document(PD_FUNC get_info, PD_FUNC output, VOIDPTR info)
                         if (!output(PD_PERIODIC, &pd, info))
                             return false;
 
-                        tok = find_token_length(DOC, pd.curr, pd.len, &size, &width);
+                        int tok = find_token_length(DOC, pd.curr, pd.len, &size, &width);
 
                         if (tok == TOK_NL || tok == TOK_FF)
                             break;
