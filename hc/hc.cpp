@@ -4076,7 +4076,7 @@ std::string preamble(PD_INFO const *pd)
             buff << R"(<a href="page)" << (pd->pnum - 1) << R"(.html">&lt; Prev</a>)";
         }
     }
-    buff << "           Iterated Dynamics Version 1.0          Page " << pd->pnum;
+    buff << "           <a href=\"index.html\">Iterated Dynamics</a> Version 1.0          Page " << pd->pnum;
     if (pd->pnum == num_pages)
     {
         buff << " Next &gt;";
@@ -4106,12 +4106,12 @@ bool html_processor::print_html(int cmd, PD_INFO *pd)
     {
         if (pd->pnum == 1)
         {
-            info.filename = "index.html";
+            info.filename = fname_ + "/index.html";
         }
         else
         {
             std::ostringstream filename;
-            filename << "page" << pd->pnum << ".html";
+            filename << fname_ << "/page" << pd->pnum << ".html";
             info.filename = filename.str();
         }
         assert(info.file == nullptr);
