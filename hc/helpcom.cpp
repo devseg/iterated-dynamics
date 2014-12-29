@@ -273,7 +273,6 @@ bool process_document(PD_FUNC get_info, PD_FUNC output, VOIDPTR info)
     PD_INFO   pd;
     char      nl = '\n',
               sp = ' ';
-    bool first_topic;
 
     pd.pnum = 1;
     pd.lnum = 0;
@@ -326,7 +325,7 @@ bool process_document(PD_FUNC get_info, PD_FUNC output, VOIDPTR info)
             ++pd.lnum;
         }
 
-        first_topic = true;
+        bool first_topic = true;
 
         bool skip_blanks;
         while (get_info(PD_GET_TOPIC, &pd, info))
