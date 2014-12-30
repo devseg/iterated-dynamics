@@ -3950,6 +3950,8 @@ public:
 
     void process();
 
+    void paginate();
+
 private:
     bool get_info(int cmd, PD_INFO *pd);
     bool print_html(int cmd, PD_INFO *pd);
@@ -4203,10 +4205,34 @@ void html_processor::print_string(char const *s, int n)
     }
 }
 
+
+void html_processor::paginate()
+{
+    PAGINATE_DOC_INFO page_info;
+
+    msg("Paginating document.");
+
+    page_info.tnum = -1;
+    page_info.cnum = info.tnum;
+    page_info.link_dest_warn = true;
+
+    process_document(pd_get_info, paginate_html_output, &page_info);
+
+    set_hot_link_doc_page();
+    set_content_doc_page();
+}
+
 void html_processor::process()
 {
     if (num_contents == 0)
         fatal(0, ".SRC has no DocContents.");
+
+    paginate();
+
+    if (errors != 0)
+    {
+        return;
+    }
 
     msg("Printing to: %s", fname_.c_str());
 
@@ -4218,11 +4244,6 @@ void compiler::render_html()
 {
     read_source_file();
     make_hot_links();
-
-    if (errors == 0)
-    {
-        paginate_html_document();
-    }
 
     if (errors == 0)
     {
