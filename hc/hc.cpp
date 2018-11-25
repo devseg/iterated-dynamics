@@ -823,19 +823,28 @@ int find_topic_title(char const *title)
  * .SRC file parser stuff
  */
 
+bool valid_label_name_first_char(char c)
+{
+    return std::isalpha(c) || c == '@' || c == '_';
+}
+
+bool valid_label_name_char(char c)
+{
+    return std::isalpha(c) || std::isdigit(c) || c == '_';
+}
 
 bool validate_label_name(char const *name)
 {
-    if (!std::isalpha(*name) && *name != '@' && *name != '_')
+    if (!valid_label_name_first_char(name[0]))
     {
-        return false;    // invalid
+        return false;
     }
 
     while (*(++name) != '\0')
     {
-        if (!std::isalpha(*name) && !std::isdigit(*name) && *name != '_')
+        if (!valid_label_name_char(name[0]))
         {
-            return false;    // invalid
+            return false;
         }
     }
 
