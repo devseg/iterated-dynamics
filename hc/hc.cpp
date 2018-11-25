@@ -1556,6 +1556,16 @@ std::FILE *open_include(std::string const &file_name)
     return result;
 }
 
+bool is_eof(int ch)
+{
+    return ch == -1;
+}
+
+bool is_command(int ch)
+{
+    return ch == '~';
+}
+
 void read_src(std::string const &fname, modes mode)
 {
     int    ch;
@@ -1593,7 +1603,7 @@ void read_src(std::string const &fname, modes mode)
     {
         ch = read_char();
 
-        if (ch == -1)     // EOF?
+        if (is_eof(ch))
         {
             if (include_stack_top >= 0)
             {
@@ -1616,7 +1626,7 @@ void read_src(std::string const &fname, modes mode)
             break;
         }
 
-        if (ch == '~')   // is is a command?
+        if (is_command(ch))
         {
             bool embedded;
             int eoff = 0;
