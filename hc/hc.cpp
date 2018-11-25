@@ -4641,6 +4641,31 @@ void html_processor::write_content(CONTENT const &c)
     }
 }
 
+static std::string trim(std::string text)
+{
+    if (!text.empty())
+    {
+        std::string::size_type begin = 0;
+        bool skipped = false;
+        while (text[begin] == ' ')
+        {
+            ++begin;
+            skipped = true;
+        }
+        std::string::size_type end = text.length()-1;
+        while (text[end] == ' ')
+        {
+            --end;
+            skipped = true;
+        }
+        if (skipped)
+        {
+            text = text.substr(begin, end - begin + 1);
+        }
+    }
+    return text;
+}
+
 void html_processor::write_topic(TOPIC const &t)
 {
     std::string const filename = rst_name(t.title) + ".rst";
@@ -4715,7 +4740,7 @@ void html_processor::write_topic(TOPIC const &t)
                 int const link_num = getint(data);
                 int const link_topic = g_all_links[link_num].topic_num;
                 data += 3*sizeof(int);
-                std::string const link_text(":doc:`" + std::string(data, width) +
+                std::string const link_text(":doc:`" + trim(std::string(data, width)) +
                     " <" + rst_name(g_topics[link_topic].title) + ">`");
                 if (!nl(link_text.length()) && !spaces.empty())
                 {
