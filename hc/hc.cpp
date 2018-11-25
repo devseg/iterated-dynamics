@@ -692,14 +692,14 @@ int read_char()
     {
         ch = read_char_aux();
 
-        if (ch >= '0' && ch <= '9')
+        if (std::isdigit(ch))
         {
             char buff[4];
             int  ctr;
 
             for (ctr = 0; true; ctr++)
             {
-                if (ch < '0' || ch > '9' || is_eof(ch) || ctr >= 3)
+                if (!std::isdigit(ch) || is_eof(ch) || ctr >= 3)
                 {
                     unread_char(ch);
                     break;
