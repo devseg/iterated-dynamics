@@ -368,12 +368,12 @@ bool is_begin_embedded(int ch)
 
 const char END_EMBEDDED_CHAR = ')';
 
-bool is_end_embedded(char c)
+bool is_end_embedded(int c)
 {
     return c == END_EMBEDDED_CHAR;
 }
 
-bool is_quote(char c)
+bool is_quote(int c)
 {
     return c == '"';
 }
@@ -381,6 +381,18 @@ bool is_quote(char c)
 bool is_quoted(const char *text, int len)
 {
     return is_quote(text[0]) && is_quote(text[len - 1]);
+}
+
+const char BEGIN_CONTENT_CHAR = '{';
+
+bool is_begin_content(int c)
+{
+    return c == BEGIN_CONTENT_CHAR;
+}
+
+bool is_end_content(int c)
+{
+    return c == '}';
 }
 
 /*
@@ -928,7 +940,7 @@ bool get_next_item()
 {
     skip_over(" \t\n");
     char *ptr = read_until(cmd, 128, ",}");
-    bool last = (*ptr == '}');
+    bool last = is_end_content(ptr[0]);
     --ptr;
     while (ptr >= cmd && std::strchr(" \t\n", *ptr))     // strip trailing spaces
     {
@@ -991,7 +1003,7 @@ void process_doc_contents(modes mode)
     while (true)
     {
         int const ch = read_char();
-        if (ch == '{')   // process a CONTENT entry
+        if (is_begin_content(ch))   // process a CONTENT entry
         {
             c.flags = 0;
             c.num_topic = 0;
@@ -1294,7 +1306,7 @@ int create_table()
             error(0, "Unexpected EOF in a Table.");
             return 0;
 
-        case '{':
+        case BEGIN_CONTENT_CHAR:
             if (count >= MAX_TABLE_SIZE)
             {
                 fatal(0, "Table is too large.");
@@ -1536,7 +1548,7 @@ void add_blank_for_split()   // add space at curr for merging two lines
 
 void put_a_char(int ch, TOPIC const *t)
 {
-    if (ch == '{' && !(t->flags & TF_DATA))    // is it a hot-link?
+    if (is_begin_content(ch) && !(t->flags & TF_DATA))    // is it a hot-link?
     {
         parse_link();
     }
