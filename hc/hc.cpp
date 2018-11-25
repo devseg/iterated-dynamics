@@ -4581,7 +4581,8 @@ void html_processor::write_index_html()
         << '\n'
         << ".. toctree::\n"
         << "   :maxdepth: 2\n"
-        << "   :caption: Contents:\n";
+        << "   :caption: Contents:\n"
+        << '\n';
     char const *text = get_topic_text(&toc_topic);
     char const *curr = text;
     unsigned int len = toc_topic.text_len;
