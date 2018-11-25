@@ -4558,7 +4558,7 @@ void html_processor::process()
     write_labels();
 }
 
-static std::string now()
+std::string now()
 {
     std::time_t t = std::time(nullptr);
     std::tm tm = *std::localtime(&t);
@@ -4651,7 +4651,7 @@ void html_processor::write_content(CONTENT const &c)
     }
 }
 
-static std::string trim(std::string text)
+std::string trim(std::string text)
 {
     if (!text.empty())
     {
