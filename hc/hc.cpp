@@ -373,6 +373,15 @@ bool is_end_embedded(char c)
     return c == END_EMBEDDED_CHAR;
 }
 
+bool is_quote(char c)
+{
+    return c == '"';
+}
+
+bool is_quoted(const char *text, int len)
+{
+    return is_quote(text[0]) && is_quote(text[len - 1]);
+}
 
 /*
  * error/warning/message reporting functions.
@@ -779,7 +788,7 @@ int find_topic_title(char const *title)
 
     ++len;
 
-    if (len > 2 && title[0] == '\"' && title[len-1] == '\"')
+    if (len > 2 && is_quoted(title, len))
     {
         ++title;
         len -= 2;
@@ -1006,12 +1015,13 @@ void process_doc_contents(modes mode)
 
             bool last = get_next_item();
 
-            if (cmd[0] == '\"')
+            if (is_quote(cmd[0]))
             {
                 char *ptr = &cmd[1];
-                if (ptr[(int) std::strlen(ptr)-1] == '\"')
+                const int end = static_cast<int>(std::strlen(ptr)) - 1;
+                if (is_quote(ptr[end]))
                 {
-                    ptr[(int) std::strlen(ptr)-1] = '\0';
+                    ptr[end] = '\0';
                 }
                 else
                 {
@@ -1061,12 +1071,13 @@ void process_doc_contents(modes mode)
                     continue;
                 }
 
-                if (cmd[0] == '\"')
+                if (is_quote(cmd[0]))
                 {
                     char *ptr = &cmd[1];
-                    if (ptr[(int) std::strlen(ptr)-1] == '\"')
+                    const int end = static_cast<int>(std::strlen(ptr))-1;
+                    if (is_quote(ptr[end]))
                     {
-                        ptr[(int) std::strlen(ptr)-1] = '\0';
+                        ptr[end] = '\0';
                     }
                     else
                     {
@@ -1496,17 +1507,17 @@ void end_topic(TOPIC *t)
 
 bool end_of_sentence(char const *ptr)  // true if ptr is at the end of a sentence
 {
-    if (is_end_embedded(*ptr))
+    if (is_end_embedded(ptr[0]))
     {
         --ptr;
     }
 
-    if (*ptr == '\"')
+    if (is_quote(ptr[0]))
     {
         --ptr;
     }
 
-    return *ptr == '.' || *ptr == '?' || *ptr == '!';
+    return ptr[0] == '.' || ptr[0] == '?' || ptr[0] == '!';
 }
 
 
