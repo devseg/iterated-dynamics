@@ -2754,19 +2754,21 @@ void make_hot_links()
      */
     for (LINK &l : g_all_links)
     {
-        // name is the title of the topic
-        if (l.type == link_types::LT_TOPIC)
+        switch (l.type)
         {
+        case link_types::LT_TOPIC:
+            // name is the title of the topic
             link_topic(l);
-        }
-        // name is the name of a label
-        else if (l.type == link_types::LT_LABEL)
-        {
+            break;
+
+        case link_types::LT_LABEL:
+            // name is the name of a label
             link_label(l);
-        }
-        // it's a "special" link; topic_off already has the value
-        else if (l.type == link_types::LT_SPECIAL)
-        {
+            break;
+
+        case link_types::LT_SPECIAL:
+            // it's a "special" link; topic_off already has the value
+            break;
         }
     }
 }
