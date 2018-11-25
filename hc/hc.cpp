@@ -4528,6 +4528,7 @@ private:
     void write_contents();
     void write_content(CONTENT const &c);
     void write_topic(TOPIC const &t);
+    void write_labels();
 
     std::string m_fname;
 };
@@ -4546,6 +4547,7 @@ void html_processor::process()
 
     write_index_html();
     write_contents();
+    write_labels();
 }
 
 static std::string now()
@@ -4763,6 +4765,22 @@ void html_processor::write_topic(TOPIC const &t)
         len -= size;
         curr += size;
     }
+}
+
+void html_processor::write_labels()
+{
+    std::string const filename = "labels.cpp";
+    msg("Writing %s", filename.c_str());
+    std::ofstream str(g_html_output_dir + '/' + filename);
+    str << "#include \"labels.h\"\n"
+        << '\n'
+        << "const char* g_urls[] = {\n";
+
+    for (LABEL const &l : g_labels)
+    {
+        str << "    \"" << rst_name(g_topics[l.topic_num].title) + ".html\",\n";
+    }
+    str << "};\n";
 }
 
 #if defined(_WIN32)
