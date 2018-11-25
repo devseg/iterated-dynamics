@@ -1618,24 +1618,21 @@ void read_src(std::string const &fname, modes mode)
 
         if (ch == '~')   // is is a command?
         {
-            bool imbedded;
-            int eoff;
+            bool embedded;
+            int eoff = 0;
 
             ch = read_char();
             if (ch == '(')
             {
-                imbedded = true;
-                eoff = 0;
+                embedded = true;
             }
             else
             {
-                imbedded = false;
-                eoff = 0;
+                embedded = false;
                 unread_char(ch);
             }
 
             bool done = false;
-
             while (!done)
             {
                 do
@@ -1645,7 +1642,7 @@ void read_src(std::string const &fname, modes mode)
                 while (ch == ' ');
                 unread_char(ch);
 
-                ptr = read_until(cmd, 128, imbedded ? ")\n," : "\n,");
+                ptr = read_until(cmd, 128, embedded ? ")\n," : "\n,");
 
                 if (*ptr == '\0')
                 {
@@ -1656,14 +1653,13 @@ void read_src(std::string const &fname, modes mode)
                 if (*ptr == '\n')
                 {
                     ++eoff;
+                    if (embedded)
+                    {
+                        error(eoff, "Embedded command has no closing paren (\')\')");
+                    }
                 }
 
-                if (imbedded && *ptr == '\n')
-                {
-                    error(eoff, "Embedded command has no closing paren (\')\')");
-                }
-
-                done = (*ptr != ',');   // we done if it's not a comma
+                done = (*ptr != ',');   // we're done if it's not a comma
 
                 if (*ptr != '\n' && *ptr != ')' && *ptr != ',')
                 {
@@ -1785,7 +1781,7 @@ void read_src(std::string const &fname, modes mode)
                     }
                     if (!done)
                     {
-                        if (imbedded)
+                        if (embedded)
                         {
                             unread_char('(');
                         }
@@ -2064,7 +2060,7 @@ void read_src(std::string const &fname, modes mode)
 
                     if (!done)
                     {
-                        if (imbedded)
+                        if (embedded)
                         {
                             unread_char('(');
                         }
