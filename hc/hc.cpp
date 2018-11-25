@@ -1275,17 +1275,17 @@ int create_table()
 
         case '~':
         {
-            bool imbedded;
+            bool embedded;
 
             ch = read_char();
 
             if (ch == '(')
             {
-                imbedded = true;
+                embedded = true;
             }
             else
             {
-                imbedded = false;
+                embedded = false;
                 unread_char(ch);
             }
 
@@ -1306,7 +1306,7 @@ int create_table()
 
             if (ch == ',')
             {
-                if (imbedded)
+                if (embedded)
                 {
                     unread_char('(');
                 }
@@ -1368,18 +1368,18 @@ void process_comment()
 
         if (ch == '~')
         {
-            bool imbedded;
+            bool embedded;
             char *ptr;
 
             ch = read_char();
 
             if (ch == '(')
             {
-                imbedded = true;
+                embedded = true;
             }
             else
             {
-                imbedded = false;
+                embedded = false;
                 unread_char(ch);
             }
 
@@ -1392,7 +1392,7 @@ void process_comment()
             {
                 if (ch == ',')
                 {
-                    if (imbedded)
+                    if (embedded)
                     {
                         unread_char('(');
                     }
