@@ -699,7 +699,7 @@ int read_char()
 
             for (ctr = 0; true; ctr++)
             {
-                if (ch < '0' || ch > '9' || ch == -1 || ctr >= 3)
+                if (ch < '0' || ch > '9' || is_eof(ch) || ctr >= 3)
                 {
                     unread_char(ch);
                     break;
@@ -830,7 +830,7 @@ char *read_until(char *buff, int len, char const *stop_chars)
     {
         ch = read_char();
 
-        if (ch == -1)
+        if (is_eof(ch))
         {
             *buff++ = '\0';
             break;
@@ -861,7 +861,7 @@ void skip_over(char const *skip)
     {
         ch = read_char();
 
-        if (ch == -1)
+        if (is_eof(ch))
         {
             break;
         }
@@ -1428,7 +1428,7 @@ void process_comment()
                 break;
             }
         }
-        else if (ch == -1)
+        else if (is_eof(ch))
         {
             error(0, "Unexpected EOF in Comment");
             break;
