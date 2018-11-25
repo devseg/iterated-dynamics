@@ -244,7 +244,7 @@ char *get_topic_text(TOPIC const *t);
 
 void check_buffer(char const *curr, unsigned off, char const *buffer);
 
-inline void check_buffer(unsigned off)
+void check_buffer(unsigned off)
 {
     check_buffer(curr, off, &buffer[0]);
 }
