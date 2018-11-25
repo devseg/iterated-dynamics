@@ -347,6 +347,33 @@ std::ostream &operator<<(std::ostream &str, TOPIC const &topic)
     return str;
 }
 
+bool is_eof(int ch)
+{
+    return ch == -1;
+}
+
+const char COMMAND_CHAR = '~';
+
+bool is_command(int ch)
+{
+    return ch == COMMAND_CHAR;
+}
+
+const char BEGIN_EMBEDDED_CHAR = '(';
+
+bool is_begin_embedded(int ch)
+{
+    return ch == BEGIN_EMBEDDED_CHAR;
+}
+
+const char END_EMBEDDED_CHAR = ')';
+
+bool is_end_embedded(char c)
+{
+    return c == END_EMBEDDED_CHAR;
+}
+
+
 /*
  * error/warning/message reporting functions.
  */
@@ -1064,7 +1091,7 @@ void process_doc_contents(modes mode)
 
             add_content(&c);
         }
-        else if (ch == '~')   // end at any command
+        else if (is_command(ch))   // end at any command
         {
             unread_char(ch);
             break;
@@ -1273,13 +1300,13 @@ int create_table()
             ++count;
             break;
 
-        case '~':
+        case COMMAND_CHAR:
         {
             bool embedded;
 
             ch = read_char();
 
-            if (ch == '(')
+            if (is_begin_embedded(ch))
             {
                 embedded = true;
             }
@@ -1308,9 +1335,9 @@ int create_table()
             {
                 if (embedded)
                 {
-                    unread_char('(');
+                    unread_char(BEGIN_EMBEDDED_CHAR);
                 }
-                unread_char('~');
+                unread_char(COMMAND_CHAR);
             }
         }
         break;
@@ -1366,14 +1393,14 @@ void process_comment()
     {
         ch = read_char();
 
-        if (ch == '~')
+        if (is_command(ch))
         {
             bool embedded;
             char *ptr;
 
             ch = read_char();
 
-            if (ch == '(')
+            if (is_begin_embedded(ch))
             {
                 embedded = true;
             }
@@ -1394,9 +1421,9 @@ void process_comment()
                 {
                     if (embedded)
                     {
-                        unread_char('(');
+                        unread_char(BEGIN_EMBEDDED_CHAR);
                     }
-                    unread_char('~');
+                    unread_char(COMMAND_CHAR);
                 }
                 break;
             }
@@ -1469,7 +1496,7 @@ void end_topic(TOPIC *t)
 
 bool end_of_sentence(char const *ptr)  // true if ptr is at the end of a sentence
 {
-    if (*ptr == ')')
+    if (is_end_embedded(*ptr))
     {
         --ptr;
     }
@@ -1556,16 +1583,6 @@ std::FILE *open_include(std::string const &file_name)
     return result;
 }
 
-bool is_eof(int ch)
-{
-    return ch == -1;
-}
-
-bool is_command(int ch)
-{
-    return ch == '~';
-}
-
 void read_src(std::string const &fname, modes mode)
 {
     int    ch;
@@ -1632,7 +1649,7 @@ void read_src(std::string const &fname, modes mode)
             int eoff = 0;
 
             ch = read_char();
-            if (ch == '(')
+            if (is_begin_embedded(ch))
             {
                 embedded = true;
             }
@@ -1671,7 +1688,7 @@ void read_src(std::string const &fname, modes mode)
 
                 done = (*ptr != ',');   // we're done if it's not a comma
 
-                if (*ptr != '\n' && *ptr != ')' && *ptr != ',')
+                if (*ptr != '\n' && !is_end_embedded(*ptr) && *ptr != ',')
                 {
                     error(0, "Command line too long.");
                     break;
@@ -1793,9 +1810,9 @@ void read_src(std::string const &fname, modes mode)
                     {
                         if (embedded)
                         {
-                            unread_char('(');
+                            unread_char(BEGIN_EMBEDDED_CHAR);
                         }
-                        unread_char('~');
+                        unread_char(COMMAND_CHAR);
                         done = true;
                     }
                     compress_spaces = true;
@@ -2072,9 +2089,9 @@ void read_src(std::string const &fname, modes mode)
                     {
                         if (embedded)
                         {
-                            unread_char('(');
+                            unread_char(BEGIN_EMBEDDED_CHAR);
                         }
-                        unread_char('~');
+                        unread_char(COMMAND_CHAR);
                         done = true;
                     }
 
@@ -2314,9 +2331,9 @@ void read_src(std::string const &fname, modes mode)
         {
             cmd[0] = ch;
             ptr = read_until(&cmd[1], 127, "\n~");
-            if (*ptr == '~')
+            if (is_command(*ptr))
             {
-                unread_char('~');
+                unread_char(COMMAND_CHAR);
             }
             *ptr = '\0';
             error(0, "Text outside of any topic \"%s\".", cmd);
