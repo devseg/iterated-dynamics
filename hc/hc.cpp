@@ -4646,6 +4646,9 @@ void html_processor::write_topic(TOPIC const &t)
     std::string const filename = rst_name(t.title) + ".rst";
     msg("Writing %s", filename.c_str());
     std::ofstream str(g_html_output_dir + '/' + filename);
+    str << t.title << '\n'
+        << std::string(t.title.length(), '=') << '\n'
+        << '\n';
     char const *text = get_topic_text(&t);
     char const *curr = text;
     unsigned int len = t.text_len;
