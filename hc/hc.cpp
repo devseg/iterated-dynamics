@@ -4775,6 +4775,32 @@ void html_processor::write_topic(TOPIC const &t)
     }
 }
 
+std::string anchor_name(std::string const &title)
+{
+    std::string name;
+    name.reserve(title.length());
+    bool dash = true;     // can't start with a dash
+    for (unsigned char c : title)
+    {
+        if (std::isalnum(c) != 0)
+        {
+            name += static_cast<char>(std::tolower(c));
+            dash = false;
+        }
+        else if (!dash)
+        {
+            name += '-';
+            dash = true;
+        }
+    }
+    auto pos = name.find_last_not_of('-');
+    if (pos != std::string::npos)
+    {
+        name.erase(pos + 1);
+    }
+    return name;
+}
+
 void html_processor::write_labels()
 {
     std::string const filename = "labels.cpp";
@@ -4786,7 +4812,8 @@ void html_processor::write_labels()
 
     for (LABEL const &l : g_labels)
     {
-        str << "    \"" << rst_name(g_topics[l.topic_num].title) + ".html\",\n";
+        std::string const &title = g_topics[l.topic_num].title;
+        str << "    \"" << rst_name(title) + ".html#" + anchor_name(title) + '-' + std::to_string(l.topic_off) + "\",\n";
     }
     str << "};\n";
 }
