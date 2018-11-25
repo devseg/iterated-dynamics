@@ -14,7 +14,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <numeric>
@@ -4546,6 +4548,15 @@ void html_processor::process()
     write_contents();
 }
 
+static std::string now()
+{
+    std::time_t t = std::time(nullptr);
+    std::tm tm = *std::localtime(&t);
+    std::ostringstream os;
+    os << std::put_time(&tm, "%c");
+    return os.str();
+}
+
 void html_processor::write_index_html()
 {
     msg("Writing index.rst");
@@ -4562,7 +4573,15 @@ void html_processor::write_index_html()
 
     TOPIC const &toc_topic = g_topics[toc.topic_num[0]];
     std::ofstream str(g_html_output_dir + "/index.rst");
-    str << ".. toctree::\n";
+    str << ".. Iterated Dynamics documentation master file, created by hc on\n"
+        << "   " << now() << '\n'
+        << '\n'
+        << "Iterated Dynamics\n"
+        << "=================\n"
+        << '\n'
+        << ".. toctree::\n"
+        << "   :maxdepth: 2\n"
+        << "   :caption: Contents:\n";
     char const *text = get_topic_text(&toc_topic);
     char const *curr = text;
     unsigned int len = toc_topic.text_len;
@@ -4591,6 +4610,12 @@ void html_processor::write_index_html()
         len -= size;
         curr += size;
     }
+    str << "\n"
+        << "Indices and Tables\n"
+        << "==================\n"
+        << "* :ref:`genindex`\n"
+        << "* :ref:`modindex`\n"
+        << "* :ref:`search`\n";
 }
 
 void html_processor::write_contents()
