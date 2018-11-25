@@ -695,7 +695,7 @@ int read_char()
         if (ch >= '0' && ch <= '9')
         {
             char buff[4];
-            int  ctr = 0;
+            int  ctr;
 
             for (ctr = 0; true; ctr++)
             {
