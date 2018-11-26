@@ -1252,21 +1252,7 @@ int const MAX_TABLE_SIZE = 100;
 
 int create_table()
 {
-    char  *ptr;
-    int    width;
-    int    cols;
-    int    start_off;
-    int    first_link;
-    int    rows;
-    int    ch;
-    int    len;
-    int    lnum;
-    int    count;
-    std::vector<std::string> title;
-    char  *table_start;
-
-    ptr = std::strchr(cmd, '=');
-
+    char *ptr = std::strchr(cmd, '=');
     if (ptr == nullptr)
     {
         return 0;    // should never happen!
@@ -1274,7 +1260,10 @@ int create_table()
 
     ptr++;
 
-    len = std::sscanf(ptr, " %d %d %d", &width, &cols, &start_off);
+    int width;
+    int cols;
+    int start_off;
+    int len = std::sscanf(ptr, " %d %d %d", &width, &cols, &start_off);
 
     if (len < 3)
     {
@@ -1290,14 +1279,15 @@ int create_table()
 
     bool done = false;
 
-    first_link = static_cast<int>(g_all_links.size());
-    table_start = curr;
-    count = 0;
+    int const first_link = static_cast<int>(g_all_links.size());
+    char *table_start = curr;
+    int count = 0;
+    std::vector<std::string> title;
 
     // first, read all the links in the table
-
     do
     {
+        int ch;
         do
         {
             ch = read_char();
@@ -1382,15 +1372,14 @@ int create_table()
     while (!done);
 
     // now, put all the links into the buffer...
-
-    rows = 1 + (count / cols);
+    int const rows = 1 + (count / cols);
 
     for (int r = 0; r < rows; r++)
     {
         put_spaces(start_off);
         for (int c = 0; c < cols; c++)
         {
-            lnum = c*rows + r;
+            int const lnum = c * rows + r;
 
             if (first_link+lnum >= static_cast<int>(g_all_links.size()))
             {
