@@ -4598,11 +4598,11 @@ void html_processor::process()
 
 std::string now()
 {
-    std::time_t t = std::time(nullptr);
-    std::tm tm = *std::localtime(&t);
-    std::ostringstream os;
-    os << std::put_time(&tm, "%c");
-    return os.str();
+    std::time_t time = std::time(nullptr);
+    std::tm *local = localtime(&time);
+    char buffer[80];
+    std::strftime(buffer, sizeof(buffer), "%c", local);
+    return std::string(buffer);
 }
 
 void html_processor::write_index_html()
