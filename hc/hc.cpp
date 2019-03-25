@@ -4267,11 +4267,16 @@ int compiler::process()
 void compiler::usage()
 {
     std::printf("To compile a .SRC file:\n");
-    std::printf("      HC /c [/s] [/m] [/r[path]] [src_file]\n");
+    std::printf("      HC /c [/s] [/m] [/r[path]] [/i path] [src_file]\n");
     std::printf("         /s       = report statistics.\n");
     std::printf("         /m       = report memory usage.\n");
     std::printf("         /r[path] = set swap file path.\n");
+    std::printf("         /i path  = add path to include search locations\n");
     std::printf("         src_file = .SRC file.  Default is \"%s\"\n", DEFAULT_SRC_FNAME);
+    std::printf("To compile a .SRC file to HTML:\n"
+                "      HC /h [/i[path]] [src_file] [/o out_dir]\n"
+                "         /i path  = add path to include search locations\n"
+                "         /o out_dir = specify output directory for HTML\n");
     std::printf("To print a .SRC file:\n");
     std::printf("      HC /p [/r[path]] [src_file] [out_file]\n");
     std::printf("         /r[path] = set swap file path.\n");
